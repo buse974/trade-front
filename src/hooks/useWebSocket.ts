@@ -2,7 +2,15 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 
 type MessageHandler = (type: string, data: any) => void;
 
-const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3000/ws';
+function getWsUrl(): string {
+  if (import.meta.env.VITE_WS_URL) return import.meta.env.VITE_WS_URL;
+  const host = window.location.hostname;
+  if (host === 'localhost' || host === '127.0.0.1') return 'ws://localhost:3000/ws';
+  // In prod: app.trade.xxx → api.trade.xxx
+  const apiHost = host.replace(/^app\./, 'api.');
+  const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+  return `${protocol}://${apiHost}/ws`;
+}
 
 export function useWebSocket(onMessage: MessageHandler) {
   const wsRef = useRef<WebSocket | null>(null);
@@ -14,7 +22,7 @@ export function useWebSocket(onMessage: MessageHandler) {
   const connect = useCallback(() => {
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
 
-    const ws = new WebSocket(WS_URL);
+    const ws = new WebSocket(getWsUrl());
 
     ws.onopen = () => {
       console.log('WebSocket connected');
