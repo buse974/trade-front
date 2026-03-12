@@ -96,8 +96,10 @@ export function PriceChart({ symbol, data, color = '#2196F3' }: Props) {
     fetch(`${API_URL}/api/history/${symbol}?range=${range}`)
       .then(r => r.json())
       .then((candles: CandleData[]) => {
-        if (candleSeriesRef.current && candles.length > 0) {
-          candleSeriesRef.current.setData(candles as any);
+        if (!Array.isArray(candles)) return setLoading(false);
+        const valid = candles.filter(c => c.time && c.open != null && c.high != null && c.low != null && c.close != null && isFinite(c.open));
+        if (candleSeriesRef.current && valid.length > 0) {
+          candleSeriesRef.current.setData(valid as any);
           candleSeriesRef.current.applyOptions({ visible: true });
           if (lineSeriesRef.current) lineSeriesRef.current.applyOptions({ visible: false });
         }
