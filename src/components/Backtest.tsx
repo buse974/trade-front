@@ -94,7 +94,18 @@ export function Backtest() {
 
   useEffect(() => {
     if (!result || !chartContainerRef.current) return;
-    if (chartRef.current) chartRef.current.remove();
+
+    // Clean up previous chart safely
+    if (chartRef.current) {
+      try { chartRef.current.remove(); } catch {}
+      chartRef.current = null;
+    }
+
+    // Clear the container
+    chartContainerRef.current.innerHTML = '';
+
+    const validData = result.capitalHistory.filter(d => d.time && isFinite(d.value));
+    if (validData.length === 0) return;
 
     const chart = createChart(chartContainerRef.current, {
       layout: { background: { color: '#1a1a2e' }, textColor: '#a0a0b0' },
@@ -112,25 +123,28 @@ export function Backtest() {
       lineWidth: 2,
     });
 
-    const validData = result.capitalHistory.filter(d => d.time && isFinite(d.value));
-    if (validData.length > 0) {
-      series.setData(validData.map(d => ({ time: d.time as any, value: d.value })));
-      series.createPriceLine({
-        price: result.capital,
-        color: '#a0a0b0',
-        lineWidth: 1,
-        lineStyle: 2,
-        axisLabelVisible: true,
-        title: 'Capital initial',
-      });
-    }
+    series.setData(validData.map(d => ({ time: d.time as any, value: d.value })));
+    series.createPriceLine({
+      price: result.capital,
+      color: '#a0a0b0',
+      lineWidth: 1,
+      lineStyle: 2,
+      axisLabelVisible: true,
+      title: 'Capital initial',
+    });
 
     chartRef.current = chart;
     const ro = new ResizeObserver(() => {
-      if (chartContainerRef.current) chart.applyOptions({ width: chartContainerRef.current.clientWidth });
+      if (chartContainerRef.current) {
+        try { chart.applyOptions({ width: chartContainerRef.current.clientWidth }); } catch {}
+      }
     });
     ro.observe(chartContainerRef.current);
-    return () => { ro.disconnect(); chart.remove(); };
+    return () => {
+      ro.disconnect();
+      try { chart.remove(); } catch {}
+      chartRef.current = null;
+    };
   }, [result]);
 
   return (
