@@ -56,7 +56,6 @@ export function Backtest() {
     setLoading(false);
   };
 
-  // Render chart
   useEffect(() => {
     if (!result || !chartContainerRef.current) return;
 
@@ -66,7 +65,7 @@ export function Backtest() {
       layout: { background: { color: '#1a1a2e' }, textColor: '#a0a0b0' },
       grid: { vertLines: { color: '#2a2a3e' }, horzLines: { color: '#2a2a3e' } },
       width: chartContainerRef.current.clientWidth,
-      height: 250,
+      height: 400,
       timeScale: { timeVisible: true },
     });
 
@@ -84,7 +83,6 @@ export function Backtest() {
       value: d.value,
     })));
 
-    // Baseline at initial capital
     series.createPriceLine({
       price: result.capital,
       color: '#a0a0b0',
@@ -105,11 +103,11 @@ export function Backtest() {
   }, [result]);
 
   return (
-    <div className="backtest-panel">
-      <h3>Backtest</h3>
+    <div className="bt-layout">
+      <div className="bt-sidebar">
+        <h3>Parametres</h3>
 
-      <div className="backtest-controls">
-        <div className="backtest-row">
+        <div className="bt-field">
           <label>Crypto</label>
           <select value={symbol} onChange={e => setSymbol(e.target.value)} className="backtest-select">
             <option value="SOL">SOL</option>
@@ -121,85 +119,120 @@ export function Backtest() {
           </select>
         </div>
 
-        <div className="backtest-row">
+        <div className="bt-field">
           <label>Mois</label>
           <input type="month" value={month} onChange={e => setMonth(e.target.value)} className="backtest-input" />
         </div>
 
-        <div className="backtest-row">
-          <label>Capital: ${capital}</label>
+        <div className="bt-field">
+          <label>Capital: <strong>${capital}</strong></label>
           <input type="range" min={10} max={10000} step={10} value={capital} onChange={e => setCapital(Number(e.target.value))} />
         </div>
 
-        <div className="backtest-row">
-          <label>Stop Loss: {stopLoss}%</label>
+        <div className="bt-field">
+          <label>Stop Loss: <strong>{stopLoss}%</strong></label>
           <input type="range" min={1} max={50} step={0.5} value={stopLoss} onChange={e => setStopLoss(Number(e.target.value))} />
         </div>
 
-        <div className="backtest-row">
-          <label>Take Profit: {takeProfit}%</label>
+        <div className="bt-field">
+          <label>Take Profit: <strong>{takeProfit}%</strong></label>
           <input type="range" min={1} max={100} step={0.5} value={takeProfit} onChange={e => setTakeProfit(Number(e.target.value))} />
         </div>
 
-        <div className="backtest-row">
-          <label>Position Size: {positionSize}%</label>
+        <div className="bt-field">
+          <label>Position Size: <strong>{positionSize}%</strong></label>
           <input type="range" min={10} max={100} step={5} value={positionSize} onChange={e => setPositionSize(Number(e.target.value))} />
         </div>
 
         <button className="backtest-btn" onClick={runBacktest} disabled={loading}>
-          {loading ? 'Calcul...' : 'Lancer le backtest'}
+          {loading ? 'Calcul...' : 'Lancer'}
         </button>
       </div>
 
-      {result && (
-        <div className="backtest-results">
-          <div className="backtest-summary">
-            <div className={`backtest-pnl ${result.pnl >= 0 ? 'positive' : 'negative'}`}>
-              {result.pnl >= 0 ? '+' : ''}{result.pnl.toFixed(2)}$ ({result.pnlPercent >= 0 ? '+' : ''}{result.pnlPercent.toFixed(1)}%)
-            </div>
-            <div className="backtest-final">
-              ${result.capital.toFixed(0)} → ${result.finalValue.toFixed(2)}
-            </div>
+      <div className="bt-main">
+        {!result && !loading && (
+          <div className="bt-empty">
+            Configure tes parametres et lance un backtest
           </div>
+        )}
 
-          <div ref={chartContainerRef} className="backtest-chart" />
+        {loading && (
+          <div className="bt-empty">Calcul en cours...</div>
+        )}
 
-          <div className="backtest-metrics">
-            <div className="stat-box">
-              <span className="stat-label">Trades</span>
-              <span className="stat-value">{result.metrics.totalTrades}</span>
-            </div>
-            <div className="stat-box">
-              <span className="stat-label">Win Rate</span>
-              <span className="stat-value">{result.metrics.winRate.toFixed(0)}%</span>
-            </div>
-            <div className="stat-box">
-              <span className="stat-label">Max Drawdown</span>
-              <span className="stat-value negative">-{result.metrics.maxDrawdown.toFixed(1)}%</span>
-            </div>
-            <div className="stat-box">
-              <span className="stat-label">Meilleur trade</span>
-              <span className="stat-value positive">+${result.metrics.bestTrade.toFixed(2)}</span>
-            </div>
-            <div className="stat-box">
-              <span className="stat-label">Pire trade</span>
-              <span className="stat-value negative">${result.metrics.worstTrade.toFixed(2)}</span>
-            </div>
-          </div>
-
-          <div className="backtest-trades">
-            <h4>Trades ({result.trades.length})</h4>
-            {result.trades.slice(-20).map((t, i) => (
-              <div key={i} className={`trade-row ${t.type === 'BUY' ? '' : t.pnl >= 0 ? 'positive' : 'negative'}`}>
-                <span>{t.type === 'BUY' ? '🟢' : '🔴'} {t.type}</span>
-                <span>${t.price.toFixed(4)}</span>
-                {t.pnl !== undefined && <span>{t.pnl >= 0 ? '+' : ''}{t.pnl.toFixed(2)}$</span>}
-                <span className="trade-reason">{t.reason || ''}</span>
+        {result && (
+          <>
+            <div className="bt-header-result">
+              <div className="bt-symbol">{result.symbol}/USDT</div>
+              <div className="bt-period">{result.month}</div>
+              <div className={`bt-pnl ${result.pnl >= 0 ? 'positive' : 'negative'}`}>
+                {result.pnl >= 0 ? '+' : ''}{result.pnl.toFixed(2)}$
+                <span className="bt-pnl-pct">({result.pnlPercent >= 0 ? '+' : ''}{result.pnlPercent.toFixed(1)}%)</span>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
+              <div className="bt-capital-range">
+                ${result.capital.toFixed(0)} → ${result.finalValue.toFixed(2)}
+              </div>
+            </div>
+
+            <div ref={chartContainerRef} className="bt-chart" />
+
+            <div className="bt-metrics-grid">
+              <div className="bt-metric">
+                <span className="bt-metric-label">Trades</span>
+                <span className="bt-metric-value">{result.metrics.totalTrades}</span>
+              </div>
+              <div className="bt-metric">
+                <span className="bt-metric-label">Wins</span>
+                <span className="bt-metric-value positive">{result.metrics.wins}</span>
+              </div>
+              <div className="bt-metric">
+                <span className="bt-metric-label">Losses</span>
+                <span className="bt-metric-value negative">{result.metrics.losses}</span>
+              </div>
+              <div className="bt-metric">
+                <span className="bt-metric-label">Win Rate</span>
+                <span className="bt-metric-value">{result.metrics.winRate.toFixed(0)}%</span>
+              </div>
+              <div className="bt-metric">
+                <span className="bt-metric-label">Max Drawdown</span>
+                <span className="bt-metric-value negative">-{result.metrics.maxDrawdown.toFixed(1)}%</span>
+              </div>
+              <div className="bt-metric">
+                <span className="bt-metric-label">Best Trade</span>
+                <span className="bt-metric-value positive">+${result.metrics.bestTrade.toFixed(2)}</span>
+              </div>
+              <div className="bt-metric">
+                <span className="bt-metric-label">Worst Trade</span>
+                <span className="bt-metric-value negative">${result.metrics.worstTrade.toFixed(2)}</span>
+              </div>
+              <div className="bt-metric">
+                <span className="bt-metric-label">Data Points</span>
+                <span className="bt-metric-value">{result.dataPoints.toLocaleString()}</span>
+              </div>
+            </div>
+
+            <div className="bt-trades-list">
+              <h4>Historique trades</h4>
+              <div className="bt-trades-scroll">
+                {result.trades.map((t, i) => (
+                  <div key={i} className="bt-trade-row">
+                    <span className={`bt-trade-type ${t.type === 'BUY' ? 'buy' : 'sell'}`}>{t.type}</span>
+                    <span className="bt-trade-price">${t.price.toFixed(4)}</span>
+                    <span className="bt-trade-qty">{t.qty.toFixed(4)}</span>
+                    {t.pnl !== undefined && (
+                      <span className={`bt-trade-pnl ${t.pnl >= 0 ? 'positive' : 'negative'}`}>
+                        {t.pnl >= 0 ? '+' : ''}{t.pnl.toFixed(2)}$
+                      </span>
+                    )}
+                    <span className="trade-reason">{t.reason || ''}</span>
+                    <span className="bt-trade-time">{new Date(t.time).toLocaleDateString()}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }

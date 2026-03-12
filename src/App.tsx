@@ -24,6 +24,7 @@ const CHART_COLORS: Record<string, string> = {
 };
 
 function App() {
+  const [page, setPage] = useState<'trading' | 'backtest'>('trading');
   const [prices, setPrices] = useState<Record<string, PriceData>>({});
   const [priceHistory, setPriceHistory] = useState<Record<string, Array<{ price: number; timestamp: number }>>>({});
   const [portfolio, setPortfolio] = useState<any>(null);
@@ -61,7 +62,6 @@ function App() {
         break;
 
       case 'trade':
-        // Trade notifications could trigger a visual effect
         break;
     }
   }, []);
@@ -73,36 +73,58 @@ function App() {
   }, [send]);
 
   return (
-    <div className="app">
+    <div className={page === 'trading' ? 'app' : 'app app-backtest'}>
       <header className="app-header">
-        <h1>TRADE BOT - SOL/USDC</h1>
+        <nav className="app-nav">
+          <button
+            className={`nav-btn ${page === 'trading' ? 'active' : ''}`}
+            onClick={() => setPage('trading')}
+          >
+            Trading
+          </button>
+          <button
+            className={`nav-btn ${page === 'backtest' ? 'active' : ''}`}
+            onClick={() => setPage('backtest')}
+          >
+            Backtest
+          </button>
+        </nav>
         <div className="connection-status">
           <div className={`status-dot ${connected ? 'connected' : ''}`} />
-          {connected ? 'Connecté' : 'Déconnecté'}
+          {connected ? 'Connecte' : 'Deconnecte'}
         </div>
       </header>
 
-      <div className="panel-left">
-        <CryptoList prices={prices} />
-        <Controls config={config} onConfigChange={handleConfigChange} />
-      </div>
+      {page === 'trading' && (
+        <>
+          <div className="panel-left">
+            <CryptoList prices={prices} />
+            <Controls config={config} onConfigChange={handleConfigChange} />
+          </div>
 
-      <div className="panel-center">
-        {['SOL', 'BTC', 'ETH', 'DOGE'].map(symbol => (
-          <PriceChart
-            key={symbol}
-            symbol={symbol}
-            data={priceHistory[symbol] || []}
-            color={CHART_COLORS[symbol] || '#2196F3'}
-          />
-        ))}
-        <Heatmap matrix={correlation.matrix} symbols={correlation.symbols} />
-      </div>
+          <div className="panel-center">
+            {['SOL', 'BTC', 'ETH', 'DOGE'].map(symbol => (
+              <PriceChart
+                key={symbol}
+                symbol={symbol}
+                data={priceHistory[symbol] || []}
+                color={CHART_COLORS[symbol] || '#2196F3'}
+              />
+            ))}
+            <Heatmap matrix={correlation.matrix} symbols={correlation.symbols} />
+          </div>
 
-      <div className="panel-right">
-        <Portfolio portfolio={portfolio} />
-        <Backtest />
-      </div>
+          <div className="panel-right">
+            <Portfolio portfolio={portfolio} />
+          </div>
+        </>
+      )}
+
+      {page === 'backtest' && (
+        <div className="page-backtest">
+          <Backtest />
+        </div>
+      )}
     </div>
   );
 }

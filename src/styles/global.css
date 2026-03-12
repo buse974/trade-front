@@ -68,6 +68,10 @@ h4 {
   background: var(--border);
 }
 
+.app.app-backtest {
+  grid-template-columns: 1fr;
+}
+
 .app-header {
   grid-column: 1 / -1;
   background: var(--bg-secondary);
@@ -75,6 +79,33 @@ h4 {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.app-nav {
+  display: flex;
+  gap: 4px;
+}
+
+.nav-btn {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 6px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.nav-btn.active {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--blue);
+}
+
+.nav-btn:hover:not(.active) {
+  background: var(--border);
 }
 
 .app-header h1 {
@@ -306,31 +337,38 @@ h4 {
   border-color: var(--green);
 }
 
-/* Backtest */
-.backtest-panel {
-  margin-top: 20px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
+/* Backtest page */
+.page-backtest {
+  grid-column: 1 / -1;
+  overflow-y: auto;
 }
 
-.backtest-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.bt-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  height: calc(100vh - 50px);
 }
 
-.backtest-row {
+.bt-sidebar {
+  background: var(--bg-secondary);
+  padding: 16px;
+  overflow-y: auto;
+  border-right: 1px solid var(--border);
+}
+
+.bt-field {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  margin-bottom: 12px;
 }
 
-.backtest-row label {
+.bt-field label {
   font-size: 12px;
   color: var(--text-secondary);
 }
 
-.backtest-row input[type="range"] {
+.bt-field input[type="range"] {
   width: 100%;
   accent-color: var(--blue);
 }
@@ -339,15 +377,17 @@ h4 {
   background: var(--bg-tertiary);
   border: 1px solid var(--border);
   color: var(--text-primary);
-  padding: 4px 8px;
+  padding: 6px 8px;
   border-radius: 4px;
   font-family: inherit;
   font-size: 12px;
+  width: 100%;
 }
 
 .backtest-btn {
+  width: 100%;
   margin-top: 8px;
-  padding: 8px 16px;
+  padding: 10px 16px;
   background: var(--blue);
   color: #fff;
   border: none;
@@ -355,47 +395,130 @@ h4 {
   cursor: pointer;
   font-family: inherit;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .backtest-btn:hover { opacity: 0.9; }
 .backtest-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.backtest-results {
-  margin-top: 16px;
+.bt-main {
+  background: var(--bg-primary);
+  padding: 20px;
+  overflow-y: auto;
 }
 
-.backtest-summary {
-  text-align: center;
-  margin-bottom: 12px;
-}
-
-.backtest-pnl {
-  font-size: 22px;
-  font-weight: 700;
-}
-
-.backtest-final {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-top: 4px;
-}
-
-.backtest-chart {
-  margin: 12px 0;
-}
-
-.backtest-metrics {
+.bt-empty {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 8px 0;
-  border-top: 1px solid var(--border);
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.bt-header-result {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--border);
 }
 
-.backtest-trades {
-  margin-top: 8px;
-  max-height: 200px;
+.bt-symbol {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--blue);
+}
+
+.bt-period {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.bt-pnl {
+  font-size: 24px;
+  font-weight: 700;
+  margin-left: auto;
+}
+
+.bt-pnl-pct {
+  font-size: 14px;
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+.bt-capital-range {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.bt-chart {
+  margin-bottom: 16px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.bt-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.bt-metric {
+  background: var(--bg-secondary);
+  padding: 12px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bt-metric-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.bt-metric-value {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.bt-trades-list {
+  background: var(--bg-secondary);
+  border-radius: 4px;
+  padding: 12px;
+}
+
+.bt-trades-list h4 {
+  margin-bottom: 8px;
+}
+
+.bt-trades-scroll {
+  max-height: 300px;
   overflow-y: auto;
 }
+
+.bt-trade-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+
+.bt-trade-type {
+  font-weight: 700;
+  width: 36px;
+}
+
+.bt-trade-type.buy { color: var(--green); }
+.bt-trade-type.sell { color: var(--red); }
+
+.bt-trade-price { width: 90px; }
+.bt-trade-qty { width: 80px; color: var(--text-muted); }
+.bt-trade-pnl { width: 80px; font-weight: 600; }
+.bt-trade-time { margin-left: auto; color: var(--text-muted); }
