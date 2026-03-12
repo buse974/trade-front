@@ -5,6 +5,7 @@ import { CryptoList } from './components/CryptoList';
 import { Portfolio } from './components/Portfolio';
 import { Controls } from './components/Controls';
 import { Heatmap } from './components/Heatmap';
+import { Backtest } from './components/Backtest';
 import './styles/global.css';
 
 interface PriceData {
@@ -100,6 +101,7 @@ function App() {
 
       <div className="panel-right">
         <Portfolio portfolio={portfolio} />
+        <Backtest />
       </div>
     </div>
   );

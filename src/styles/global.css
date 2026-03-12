@@ -305,3 +305,97 @@ h4 {
   color: #000;
   border-color: var(--green);
 }
+
+/* Backtest */
+.backtest-panel {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.backtest-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.backtest-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.backtest-row label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.backtest-row input[type="range"] {
+  width: 100%;
+  accent-color: var(--blue);
+}
+
+.backtest-select, .backtest-input {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 12px;
+}
+
+.backtest-btn {
+  margin-top: 8px;
+  padding: 8px 16px;
+  background: var(--blue);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.backtest-btn:hover { opacity: 0.9; }
+.backtest-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.backtest-results {
+  margin-top: 16px;
+}
+
+.backtest-summary {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.backtest-pnl {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.backtest-final {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.backtest-chart {
+  margin: 12px 0;
+}
+
+.backtest-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.backtest-trades {
+  margin-top: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+}
