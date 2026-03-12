@@ -522,3 +522,100 @@ h4 {
 .bt-trade-qty { width: 80px; color: var(--text-muted); }
 .bt-trade-pnl { width: 80px; font-weight: 600; }
 .bt-trade-time { margin-left: auto; color: var(--text-muted); }
+.bt-trade-profile { font-size: 11px; font-weight: 600; }
+
+/* Profiles */
+.bt-profiles {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.bt-profile {
+  background: var(--bg-tertiary);
+  border-left: 3px solid;
+  border-radius: 0 4px 4px 0;
+  padding: 8px;
+}
+
+.bt-profile-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bt-profile-name {
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.bt-profile-desc {
+  font-size: 10px;
+  color: var(--text-muted);
+  flex: 1;
+}
+
+.bt-profile-toggle {
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 3px;
+  border: none;
+  cursor: pointer;
+}
+
+.bt-profile-toggle.on {
+  background: var(--green);
+  color: #000;
+}
+
+.bt-profile-toggle.off {
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+}
+
+.bt-profile-sliders {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bt-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bt-slider label {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.bt-slider input[type="range"] {
+  width: 100%;
+  accent-color: var(--blue);
+  height: 4px;
+}
+
+/* Profile distribution bar */
+.bt-profile-bar {
+  display: flex;
+  height: 24px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.bt-profile-segment {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: #000;
+  white-space: nowrap;
+  overflow: hidden;
+}
