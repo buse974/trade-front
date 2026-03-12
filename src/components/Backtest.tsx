@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { createChart, LineSeries, AreaSeries } from 'lightweight-charts';
+import { createChart, AreaSeries } from 'lightweight-charts';
 import type { IChartApi } from 'lightweight-charts';
 
 const API_URL = window.location.hostname === 'localhost'
