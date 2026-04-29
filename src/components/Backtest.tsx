@@ -27,9 +27,10 @@ interface BacktestResult {
   finalValue: number;
   pnl: number;
   pnlPercent: number;
+  useRegime: boolean;
   trades: any[];
-  capitalHistory: { time: number; value: number; profile: string }[];
-  profileHistory: { time: number; profile: string; d1: number; d2: number }[];
+  capitalHistory: { time: number; value: number; profile: string; regime?: string | null }[];
+  profileHistory: { time: number; profile: string; d1: number; d2: number; regime?: string | null }[];
   metrics: {
     totalTrades: number;
     wins: number;
@@ -39,9 +40,16 @@ interface BacktestResult {
     bestTrade: number;
     worstTrade: number;
     profileDistribution: Record<string, string>;
+    regimeDistribution: Record<string, string> | null;
   };
   dataPoints: number;
 }
+
+const REGIME_META: Record<string, { label: string; color: string }> = {
+  actif:   { label: 'Actif',   color: '#00c853' },
+  calme:   { label: 'Calme',   color: '#ff9800' },
+  unknown: { label: 'Inconnu', color: '#606070' },
+};
 
 const PROFILE_META: Record<string, { label: string; desc: string; color: string }> = {
   bullish:    { label: 'Haussier',      desc: 'D1 > 0, D2 > 0', color: '#26a69a' },
@@ -63,6 +71,8 @@ export function Backtest() {
   const [capital, setCapital] = useState(100);
   const [window, setWindow] = useState(60);
   const [profiles, setProfiles] = useState<Profiles>({ ...DEFAULT_PROFILES });
+  const [useRegime, setUseRegime] = useState(false);
+  const [regimeHorizon, setRegimeHorizon] = useState<'5m' | '15m' | '1h'>('15m');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<BacktestResult | null>(null);
   const chartContainerRef = useRef<HTMLDivElement>(null);
@@ -81,7 +91,7 @@ export function Backtest() {
       const res = await fetch(`${API_URL}/api/backtest`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ symbol, month, capital, window, profiles }),
+        body: JSON.stringify({ symbol, month, capital, window, profiles, useRegime, regimeHorizon }),
       });
       const data = await res.json();
       if (res.ok) setResult(data);
@@ -176,6 +186,34 @@ export function Backtest() {
           <input type="range" min={10} max={240} step={10} value={window} onChange={e => setWindow(Number(e.target.value))} />
         </div>
 
+        <div className="bt-regime">
+          <div className="bt-regime-header">
+            <label className="bt-regime-toggle-label">
+              <input
+                type="checkbox"
+                checked={useRegime}
+                onChange={e => setUseRegime(e.target.checked)}
+              />
+              <span>Filtre ML régime</span>
+            </label>
+            <span className="bt-regime-desc">Bloque les entrées en marché calme</span>
+          </div>
+          {useRegime && (
+            <div className="bt-field">
+              <label>Horizon</label>
+              <select
+                value={regimeHorizon}
+                onChange={e => setRegimeHorizon(e.target.value as '5m' | '15m' | '1h')}
+                className="backtest-select"
+              >
+                <option value="5m">5 min</option>
+                <option value="15m">15 min</option>
+                <option value="1h">1 heure</option>
+              </select>
+            </div>
+          )}
+        </div>
+
         <div className="bt-profiles">
           {(Object.keys(PROFILE_META) as Array<keyof Profiles>).map(key => {
             const meta = PROFILE_META[key];
@@ -244,21 +282,47 @@ export function Backtest() {
 
             {/* Profile distribution bar */}
             {result.metrics.profileDistribution && (
-              <div className="bt-profile-bar">
-                {(Object.keys(PROFILE_META) as string[]).map(key => {
-                  const pct = parseInt(result.metrics.profileDistribution[key] || '0');
-                  if (pct === 0) return null;
-                  return (
-                    <div
-                      key={key}
-                      className="bt-profile-segment"
-                      style={{ width: `${pct}%`, background: PROFILE_META[key].color }}
-                      title={`${PROFILE_META[key].label}: ${pct}%`}
-                    >
-                      {pct > 8 && <span>{PROFILE_META[key].label} {pct}%</span>}
-                    </div>
-                  );
-                })}
+              <div className="bt-bar-block">
+                <div className="bt-bar-label">Profils D1/D2</div>
+                <div className="bt-profile-bar">
+                  {(Object.keys(PROFILE_META) as string[]).map(key => {
+                    const pct = parseInt(result.metrics.profileDistribution[key] || '0');
+                    if (pct === 0) return null;
+                    return (
+                      <div
+                        key={key}
+                        className="bt-profile-segment"
+                        style={{ width: `${pct}%`, background: PROFILE_META[key].color }}
+                        title={`${PROFILE_META[key].label}: ${pct}%`}
+                      >
+                        {pct > 8 && <span>{PROFILE_META[key].label} {pct}%</span>}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Regime distribution bar (only if useRegime was active) */}
+            {result.useRegime && result.metrics.regimeDistribution && (
+              <div className="bt-bar-block">
+                <div className="bt-bar-label">Régime ML ({regimeHorizon})</div>
+                <div className="bt-profile-bar">
+                  {(Object.keys(REGIME_META) as string[]).map(key => {
+                    const pct = parseInt(result.metrics.regimeDistribution![key] || '0');
+                    if (pct === 0) return null;
+                    return (
+                      <div
+                        key={key}
+                        className="bt-profile-segment"
+                        style={{ width: `${pct}%`, background: REGIME_META[key].color }}
+                        title={`${REGIME_META[key].label}: ${pct}%`}
+                      >
+                        {pct > 8 && <span>{REGIME_META[key].label} {pct}%</span>}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
 

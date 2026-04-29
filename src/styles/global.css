@@ -131,6 +131,91 @@ h4 {
 
 .status-dot.connected { background: var(--green); }
 
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Regime badge */
+.regime-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.regime-badge .regime-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-muted);
+}
+
+.regime-badge.regime-actif .regime-dot {
+  background: var(--green);
+  box-shadow: 0 0 6px rgba(0, 200, 83, 0.6);
+}
+
+.regime-badge.regime-calme .regime-dot {
+  background: var(--orange);
+}
+
+.regime-badge.regime-stale .regime-dot {
+  background: var(--text-muted);
+  animation: regime-pulse 1.5s infinite;
+}
+
+@keyframes regime-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.regime-badge .regime-label {
+  letter-spacing: 0.5px;
+}
+
+.regime-badge.regime-actif .regime-label { color: var(--green); }
+.regime-badge.regime-calme .regime-label { color: var(--orange); }
+.regime-badge.regime-stale .regime-label { color: var(--text-muted); }
+
+.regime-badge .regime-proba {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.regime-badge .regime-horizons {
+  display: flex;
+  gap: 3px;
+  padding-left: 8px;
+  border-left: 1px solid var(--border);
+  margin-left: 2px;
+}
+
+.regime-h {
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 2px;
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.regime-h-actif {
+  background: rgba(0, 200, 83, 0.15);
+  color: var(--green);
+}
+
+.regime-h-calme {
+  background: rgba(255, 152, 0, 0.15);
+  color: var(--orange);
+}
+
 /* Panels */
 .panel-left {
   background: var(--bg-secondary);
@@ -600,13 +685,24 @@ h4 {
   height: 4px;
 }
 
-/* Profile distribution bar */
+/* Profile / regime distribution bars */
+.bt-bar-block {
+  margin-bottom: 12px;
+}
+
+.bt-bar-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
 .bt-profile-bar {
   display: flex;
   height: 24px;
   border-radius: 4px;
   overflow: hidden;
-  margin-bottom: 16px;
 }
 
 .bt-profile-segment {
@@ -618,4 +714,47 @@ h4 {
   color: #000;
   white-space: nowrap;
   overflow: hidden;
+}
+
+/* Regime filter toggle (sidebar) */
+.bt-regime {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 10px 12px;
+  margin: 12px 0;
+}
+
+.bt-regime-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bt-regime-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.bt-regime-toggle-label input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  accent-color: var(--blue);
+}
+
+.bt-regime-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  padding-left: 22px;
+}
+
+.bt-regime .bt-field {
+  margin-top: 8px;
+  margin-bottom: 0;
 }

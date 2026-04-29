@@ -6,6 +6,7 @@ import { Portfolio } from './components/Portfolio';
 import { Controls } from './components/Controls';
 import { Heatmap } from './components/Heatmap';
 import { Backtest } from './components/Backtest';
+import { RegimeBadge } from './components/RegimeBadge';
 import './styles/global.css';
 
 interface PriceData {
@@ -14,6 +15,18 @@ interface PriceData {
   change24h?: number;
   speed?: number;
   source?: string;
+}
+
+interface RegimePoint {
+  regime: 'actif' | 'calme';
+  proba: number;
+  stale?: boolean;
+  error?: string;
+}
+
+interface RegimeData {
+  current: RegimePoint | null;
+  all: Record<string, RegimePoint>;
 }
 
 const CHART_COLORS: Record<string, string> = {
@@ -30,6 +43,7 @@ function App() {
   const [portfolio, setPortfolio] = useState<any>(null);
   const [config, setConfig] = useState<any>(null);
   const [correlation, setCorrelation] = useState<{ matrix: number[][]; symbols: string[] }>({ matrix: [], symbols: [] });
+  const [regime, setRegime] = useState<RegimeData | null>(null);
 
   const handleMessage = useCallback((type: string, data: any) => {
     switch (type) {
@@ -38,6 +52,11 @@ function App() {
         setPortfolio(data.portfolio);
         setConfig(data.config);
         setCorrelation(data.correlation || { matrix: [], symbols: [] });
+        if (data.regime) setRegime(data.regime);
+        break;
+
+      case 'regime':
+        setRegime(data);
         break;
 
       case 'price':
@@ -89,9 +108,12 @@ function App() {
             Backtest
           </button>
         </nav>
-        <div className="connection-status">
-          <div className={`status-dot ${connected ? 'connected' : ''}`} />
-          {connected ? 'Connecte' : 'Deconnecte'}
+        <div className="header-right">
+          <RegimeBadge regime={regime} />
+          <div className="connection-status">
+            <div className={`status-dot ${connected ? 'connected' : ''}`} />
+            {connected ? 'Connecte' : 'Deconnecte'}
+          </div>
         </div>
       </header>
 
